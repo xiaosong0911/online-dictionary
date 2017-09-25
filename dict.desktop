@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Online Dictionary
+Comment=Online Dictionary
+StartupWMClass=online-dictionary
+Exec=python ${path-to-dictionary}/main.py
+Icon=dictionary.svg
+Type=Application
+Categories=Network;
+MimeType=text/html;text/xml;application/xhtml_xml;image/webp;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;
