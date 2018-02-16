@@ -37,6 +37,9 @@ class MainWindow(QMainWindow):
         self.web.setHtml(html, QUrl('about:blank'))
 
 app = QApplication(sys.argv)
+app.setApplicationName('online-dictionary')
 window = MainWindow()
-window.show()
-app.exec_()
+
+def run():
+    window.show()
+    app.exec_()
