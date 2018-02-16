@@ -1,55 +1,42 @@
-import os
-import re
-import tkinter as tk
-from tkinter import scrolledtext
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtWebKitWidgets import *
 
-from query import getEntry
+import sys, os
 
-win = tk.Tk(className='online-dictionary')
-win.title("dictionary")
+from query import *
 
-width = 500
-height = 300
-font = (None, 11)
-x = (win.winfo_screenwidth() // 2) - (width // 2)
-y = (win.winfo_screenheight() // 2) - (height // 2)
-win.geometry('{}x{}+{}+{}'.format(width, height, x, y))
-#win.resizable(False, False)
+class MainWindow(QMainWindow):
+    def __init__(self, *args, **kwargs):
+        super(MainWindow, self).__init__(*args, **kwargs)
 
-def showPhrase(event):
-    key = word.get()
-    with open(os.path.expanduser('~/Documents/vocabulary.txt'),'a') as fo:
-        fo.write(key + '\n')
-    text = getEntry(key)
-    tb.config(state='normal')
-    tb.delete(1.0, tk.END)
-    tb.insert(tk.INSERT, text)
-    tb.config(state='disabled')
-    win.clipboard_clear()
-    win.clipboard_append(text)
-win.bind('<Return>', showPhrase)
+        self.setWindowTitle('bing dictionary')
 
-re_phrase = re.compile('^[A-Za-z. ]*$')
-def checkClipboard(event):
-    if event.widget == ent:
-        clipboard_text = win.clipboard_get()
-        if re_phrase.match(clipboard_text):
-            ent.delete(0, 'end')
-            ent.insert('end', clipboard_text)
-win.bind('<FocusIn>', checkClipboard)
+        layout = QVBoxLayout()
 
-word = tk.StringVar()
-ent = tk.Entry(win, text='welcome!', textvariable=word, font=font)
-ent.pack(fill='x')
+        line = QLineEdit()
+        line.returnPressed.connect(lambda : self.lookupEntry(self.line.text()))
+        layout.addWidget(line)
+        self.line = line
 
-tb = scrolledtext.ScrolledText(win, font=font)
-tb.config(state='disabled')
-tb.pack(fill='both', expand='yes')
+        web = QWebView()
+        layout.addWidget(web)
+        self.web = web
 
-ent.focus()
+        widget = QWidget()
+        widget.setLayout(layout)
 
-def run():
-    win.mainloop()
+        self.setCentralWidget(widget)
 
-if __name__ == '__main__':
-    run()
+    def lookupEntry(self, word):
+        word, html = getEntry(word)
+        with open(os.path.expanduser('~/Documents/vocabulary.txt'),'a') as fo:
+            fo.write(word + '\n')
+        self.line.setText(word)
+        self.web.setHtml(html, QUrl('about:blank'))
+
+app = QApplication(sys.argv)
+window = MainWindow()
+window.show()
+app.exec_()
